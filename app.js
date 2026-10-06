@@ -20,8 +20,35 @@ const loadData = async () => {
     renderBarChart(data);
     renderLineChart(data);
   } catch (error) {
-    $('#status').text('加载失败：' + error.message).show();
+    let msg = '加载失败：' + error.message;
+    if (window.location.protocol === 'file:') {
+      msg += '（提示：浏览器直接双击 file:// 打开会拦截 fetch，可访问 <a href="http://localhost:8080/example-06/index.html" class="alert-link">http://localhost:8080/example-06/index.html</a> 或 <a href="#" id="use-local-data" class="alert-link">点击此处使用内置数据快速演示</a>）';
+    }
+    $('#status').html(msg).show();
+    $('#use-local-data').on('click', function(e) {
+      e.preventDefault();
+      $('#status').hide();
+      state.data = localFallbackData;
+      $('#sub-title').text(localFallbackData.title + ' · 数据来源：' + (localFallbackData.source || '课程统一数据集'));
+      renderCards(localFallbackData);
+      renderBarChart(localFallbackData);
+      renderLineChart(localFallbackData);
+    });
   }
+};
+
+const localFallbackData = {
+  title: "图书馆借阅月报",
+  source: "课程统一数据集（教学演示数据，非真实统计）",
+  months: ["3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月", "1月", "2月"],
+  series: [
+    { category: "文学", counts: [352, 389, 401, 378, 296, 243, 398, 412, 437, 405, 361, 328] },
+    { category: "科技", counts: [131, 142, 156, 149, 118, 96, 151, 163, 171, 158, 139, 124] },
+    { category: "历史", counts: [92, 101, 110, 104, 83, 71, 105, 112, 118, 109, 97, 88] },
+    { category: "经济", counts: [71, 78, 86, 82, 64, 52, 83, 89, 94, 87, 77, 69] },
+    { category: "艺术", counts: [76, 84, 92, 88, 69, 58, 88, 95, 101, 93, 82, 74] },
+    { category: "外语", counts: [98, 109, 118, 112, 88, 73, 112, 121, 128, 119, 105, 94] }
+  ]
 };
 
 const renderCards = (data) => {
