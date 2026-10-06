@@ -1,4 +1,4 @@
-// app.js 第二步：ECharts柱状图
+// app.js 第三步：Chart.js折线图与窗口自适应
 const state = { data: null };
 
 const loadData = async () => {
@@ -61,6 +61,40 @@ const renderBarChart = (data) => {
   });
 };
 
-const renderLineChart = (data) => {};
+let lineChart = null;
+const renderLineChart = (data) => {
+  if (lineChart !== null) {
+    lineChart.destroy(); // 防重复初始化
+  }
+  const ctx = document.querySelector('#line-chart');
+  lineChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.months,
+      datasets: data.series.map(s => ({
+        label: s.category,
+        data: s.counts,
+        borderWidth: 1
+      }))
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: { display: true, text: '借阅趋势（单位：册）' }
+      }
+    }
+  });
+};
+
+// 窗口自适应
+window.addEventListener('resize', () => {
+  if (barChart) barChart.resize(); // Chart.js 响应式默认自动处理
+});
+
+// 第四步（选做进阶）：jQuery 改造交互，点击卡片切换高亮
+$('#cards').on('click', '.card', function () {
+  $(this).toggleClass('border-primary shadow');
+});
 
 loadData();
